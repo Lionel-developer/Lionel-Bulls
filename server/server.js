@@ -11,26 +11,22 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Hardcoded MongoDB URI and JWT secret key
 const URI = "mongodb://localhost:27017/lionel-bulls";
-const secretKey = "uk9NnCN8HZLVVUmc7V6utJxtKRMcZ5V4";  // Hardcoded JWT Secret Key
+const secretKey = "uk9NnCN8HZLVVUmc7V6utJxtKRMcZ5V4";
 
 console.log("MONGO_URI:", URI);
 console.log("JWT_SECRET:", secretKey);
 
-// Routes
 app.use('/api/auth', authRoutes);
-
-// Middleware to protect routes with JWT
 const protectRoute = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];  // Extract token from Authorization header
+  const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
 
   try {
     // Verify the token
-    const decoded = jwt.verify(token, secretKey);  // Use hardcoded JWT secret
-    req.user = decoded;  // Attach user info to the request object
-    next();  // Proceed to the next middleware or route handler
+    const decoded = jwt.verify(token, secretKey);
+    req.user = decoded;
+    next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });
   }
@@ -40,7 +36,7 @@ const protectRoute = (req, res, next) => {
 app.get('/api/dashboard', protectRoute, (req, res) => {
   res.json({
     message: 'Welcome to your dashboard!',
-    userId: req.user.id,  // Access user ID from the JWT
+    userId: req.user.id,
   });
 });
 
@@ -55,5 +51,5 @@ mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
-    process.exit(1);  // Exit the process if MongoDB connection fails
+  process.exit(1);
   });
